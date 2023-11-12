@@ -26,4 +26,11 @@ class Neuron:
             self.value = 1 / (1 + (pow(math.e, -result)))
 
     def set_output_edges(self, edges: List[Edge]):
+        """
+        Bu fonksiyon çıkış kenarlarını ayarlamak için kullanılır.
+        Parametre olarak :class:`Edge` sınıfından oluşan bir liste alır.
+        Bu liste bir nöronun sinapslarını temsil eder.
+        :param edges:
+        :return:
+        """
         self.output_edges = edges

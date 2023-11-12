@@ -6,7 +6,6 @@ from layer import Layer
 from layer_types import LayerTypes
 from neuron import Neuron
 
-LEARNING_FACTOR = 0.1
 
 table = [
     # {
@@ -24,35 +23,35 @@ table = [
         "target1": 0,
         "target2": 0
     },
-    {
-        "x0": 0,
-        "x1": 1,
-        "x2": 0,
-        "x3": 0,
-        "target1": 0,
-        "target2": 1
-    },
-    {
-        "x0": 0,
-        "x1": 0,
-        "x2": 1,
-        "x3": 0,
-        "target1": 1,
-        "target2": 0
-    },
-    {
-        "x0": 0,
-        "x1": 0,
-        "x2": 0,
-        "x3": 1,
-        "target1": 1,
-        "target2": 1
-    },
+    # {
+    #     "x0": 0,
+    #     "x1": 1,
+    #     "x2": 0,
+    #     "x3": 0,
+    #     "target1": 0,
+    #     "target2": 1
+    # },
+    # {
+    #     "x0": 0,
+    #     "x1": 0,
+    #     "x2": 1,
+    #     "x3": 0,
+    #     "target1": 1,
+    #     "target2": 0
+    # },
+    # {
+    #     "x0": 0,
+    #     "x1": 0,
+    #     "x2": 0,
+    #     "x3": 1,
+    #     "target1": 1,
+    #     "target2": 1
+    # },
 ]
 
 try:
     hidden_layer = int(input("Kaç adet gizli katman var?"))
-except TypeError:
+except ValueError:
     print("Oops! Sayı girmelisin")
 else:
     artificial_networks = []
@@ -63,6 +62,9 @@ else:
         output_layer = None
 
         for key in i.keys():
+            # Giriş katmanının oluşturulduğu yer.
+            # Buradaki nöronların giriş kenarları yoktur.
+            # Sadece değerleri ve çıkış kenarları vardır.
             if key.__contains__("x"):
                 weights = [random.randint(1, 10) / 10 for _ in range(hidden_layer)]
                 value = float(i.get(key))
@@ -83,7 +85,9 @@ else:
                 layer_type=LayerTypes.input_layer,
                 neurons=neurons,
             )
+        # Giriş katmanını ekleme işlemi bitti
 
+        # Eğer giriş katmanı oluşmuşsa gizli katman oluşturulacak
         if input_layer:
             neurons = []
             for j in range(hidden_layer):
@@ -104,12 +108,21 @@ else:
                     output_edges.append(edge)
                 neuron.set_output_edges(output_edges)
                 neurons.append(neuron)
+
+            # Gizli katman oluşturuldu
             if neurons:
+                # Burası ilk katman ile gizli katman arası bağlantıyı sağlayan yer, çok önemli
+                # Eğer burası olmazsa bağlı liste özelliği olmaz
+                for _neuron in input_layer.neurons:
+                    for j, edge in enumerate(_neuron.output_edges):
+                        edge.output_neuron = neurons[j]
+
                 intermediate_layer = Layer(
                     layer_type=LayerTypes.hidden_layer,
                     neurons=neurons
                 )
 
+        # Eğer ara (gizli) katman varsa son katmanımız oluşturulacak
         if intermediate_layer:
             neurons = []
             for j in range(2):
@@ -122,13 +135,16 @@ else:
                 neuron.calculate_input_value()
                 neurons.append(neuron)
             if neurons:
+                for _neuron in intermediate_layer.neurons:
+                    for j, edge in enumerate(_neuron.output_edges):
+                        edge.output_neuron = neurons[j]
+
                 output_layer = Layer(
                     layer_type=LayerTypes.output_layer,
                     neurons=neurons
                 )
 
         if output_layer:
-            print(input_layer.neurons[0].output_edges[0].output_neuron.value)
             artificial_neural_network = ArtificialNeuralNetwork(
                 first_layer=input_layer,
                 hidden_layers=intermediate_layer,
@@ -137,5 +153,10 @@ else:
             )
             artificial_networks.append(artificial_neural_network)
     if artificial_networks:
-        for artificial_network in artificial_networks:
-            artificial_network.calculate_tolerance()
+        while True:
+            key = input("Tekrar hesaplama için x tuşuna basın")
+            if key == "x":
+                for artificial_network in artificial_networks:
+                    artificial_network.calculate_tolerance()
+            else:
+                exit(1)
