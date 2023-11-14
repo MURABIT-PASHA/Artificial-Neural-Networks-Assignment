@@ -5,62 +5,29 @@ from neuron import Edge
 from layer import Layer
 from layer_types import LayerTypes
 from neuron import Neuron
+import pandas as pd
 
-
-table = [
-    {
-        "x0": 1,
-        "x1": 0,
-        "x2": 0,
-        "x3": 0,
-        "target1": 0,
-        "target2": 0
-    },
-    {
-        "x0": 0,
-        "x1": 1,
-        "x2": 0,
-        "x3": 0,
-        "target1": 0,
-        "target2": 1
-    },
-    {
-        "x0": 0,
-        "x1": 0,
-        "x2": 1,
-        "x3": 0,
-        "target1": 1,
-        "target2": 0
-    },
-    {
-        "x0": 0,
-        "x1": 0,
-        "x2": 0,
-        "x3": 1,
-        "target1": 1,
-        "target2": 1
-    },
-]
-
+file = pd.read_csv("test_data.csv")
 try:
     hidden_layer = int(input("Kaç adet gizli katman var?"))
 except ValueError:
     print("Oops! Sayı girmelisin")
 else:
     artificial_networks = []
-    for i in table:
+    for row in range(len(file)):
         neurons = []
         input_layer = None
         intermediate_layer = None
         output_layer = None
 
-        for key in i.keys():
+        for key in file.iloc[row].keys():
             # Giriş katmanının oluşturulduğu yer.
             # Buradaki nöronların giriş kenarları yoktur.
             # Sadece değerleri ve çıkış kenarları vardır.
             if key.__contains__("x"):
                 weights = [random.randint(1, 10) / 10 for _ in range(hidden_layer)]
-                value = float(i.get(key))
+                value = float(file.loc[row, key])
+                print(value)
                 neuron = Neuron(
                     value=value,
                 )
@@ -142,7 +109,7 @@ else:
                 first_layer=input_layer,
                 hidden_layers=intermediate_layer,
                 output_layer=output_layer,
-                targets=[float(i[key]) for key in i.keys() if "target" in key]
+                targets=[float(file.loc[row, key]) for key in file.iloc[row].keys() if "target" in key]
             )
             artificial_networks.append(artificial_neural_network)
     if artificial_networks:

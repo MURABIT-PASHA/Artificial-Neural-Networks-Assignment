@@ -20,15 +20,12 @@ class ArtificialNeuralNetwork:
         for i, first in enumerate(self.first_layer.neurons):
             self.graph.add_node(f'x{i}', label=f"{first.value}", pos=([0, -i]))
 
-        # Add nodes and edges for the hidden layer
         for i, hidden in enumerate(self.hidden_layers.neurons):
             self.graph.add_node(f'h{i}', label=f"{hidden.value}", pos=([20, -i]))
 
-        # Add nodes and edges for the output layer
         for i, output in enumerate(self.output_layer.neurons):
             self.graph.add_node(f'o{i}', label=f"{output.value}", pos=([40, -i]))
 
-        # Add edges between nodes
         for i, first in enumerate(self.first_layer.neurons):
             for j, hidden in enumerate(self.hidden_layers.neurons):
                 weight = self.first_layer.neurons[i].output_edges[j].weight
