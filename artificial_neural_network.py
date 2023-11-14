@@ -9,40 +9,58 @@ LEARNING_FACTOR = 0.1
 
 
 class ArtificialNeuralNetwork:
-    def __init__(self, first_layer: Layer, hidden_layers: Layer, output_layer: Layer, targets: List[float]):
-        self.first_layer = first_layer
+    """
+    Bu sınıf bir yapay sinir ağını temsil eder.
+    """
+
+    def __init__(self, input_layer: Layer, hidden_layers: Layer, output_layer: Layer, targets: List[float]):
+        """
+        :param input_layer: Giriş katmanıdır. :class:`Layer` sınıfından türetilmiştir
+        :param hidden_layers: Gizli katmanlardır. :class:`Layer` sınıfından türetilmiştir
+        :param output_layer: Çıkış katmanıdır. :class:`Layer` sınıfından türetilmiştir
+        :param targets: Beklenen hedefleri temsil eder
+        """
+        self.input_layer = input_layer
         self.hidden_layers = hidden_layers
         self.output_layer = output_layer
         self.targets = targets
-        self.graph = nx.DiGraph()
+        self.__graph = nx.DiGraph()
 
     def draw_diagram(self):
-        for i, first in enumerate(self.first_layer.neurons):
-            self.graph.add_node(f'x{i}', label=f"{first.value}", pos=([0, -i]))
+        """
+        Matplotlib kullanarak bir diagram çizmek için kullanılmaktadır.
+        :return:
+        """
+        for i, first in enumerate(self.input_layer.neurons):
+            self.__graph.add_node(f'x{i}', label=f"{first.value}", pos=([0, -i]))
 
         for i, hidden in enumerate(self.hidden_layers.neurons):
-            self.graph.add_node(f'h{i}', label=f"{hidden.value}", pos=([20, -i]))
+            self.__graph.add_node(f'h{i}', label=f"{hidden.value}", pos=([20, -i]))
 
         for i, output in enumerate(self.output_layer.neurons):
-            self.graph.add_node(f'o{i}', label=f"{output.value}", pos=([40, -i]))
+            self.__graph.add_node(f'o{i}', label=f"{output.value}", pos=([40, -i]))
 
-        for i, first in enumerate(self.first_layer.neurons):
+        for i, first in enumerate(self.input_layer.neurons):
             for j, hidden in enumerate(self.hidden_layers.neurons):
-                weight = self.first_layer.neurons[i].output_edges[j].weight
-                self.graph.add_edge(f'x{i}', f'h{j}', weight=weight)
+                weight = self.input_layer.neurons[i].output_edges[j].weight
+                self.__graph.add_edge(f'x{i}', f'h{j}', weight=weight)
 
         for i, hidden in enumerate(self.hidden_layers.neurons):
             for j, output in enumerate(self.output_layer.neurons):
                 weight = self.hidden_layers.neurons[i].output_edges[j].weight
-                self.graph.add_edge(f'h{i}', f'o{j}', weight=weight)
-        pos = nx.get_node_attributes(self.graph, 'pos')
-        edge_labels = nx.get_edge_attributes(self.graph, 'weight')
-        node_labels = nx.get_node_attributes(self.graph, 'label')
+                self.__graph.add_edge(f'h{i}', f'o{j}', weight=weight)
+        pos = nx.get_node_attributes(self.__graph, 'pos')
+        edge_labels = nx.get_edge_attributes(self.__graph, 'weight')
+        node_labels = nx.get_node_attributes(self.__graph, 'label')
         print(node_labels)
-        nx.draw(self.graph, pos, with_labels=True, node_size=500, node_color='skyblue', labels=node_labels)
-        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=edge_labels)
+        nx.draw(self.__graph, pos, with_labels=True, node_size=500, node_color='skyblue', labels=node_labels)
+        nx.draw_networkx_edge_labels(self.__graph, pos, edge_labels=edge_labels)
 
     def create_image(self):
+        """
+        Diagram yönetimini yapmak için kullanılmıştır.
+        :return:
+        """
         self.draw_diagram()
 
         def on_button_click(event):
@@ -60,6 +78,10 @@ class ArtificialNeuralNetwork:
         plt.show()
 
     def calculate_tolerance(self):
+        """
+        Hata hesaplaması yapmaktadır. Eğer beklenen değer (target) çıkış değerinden farklıysa bu fonksiyon çalışır.
+        :return:
+        """
         has_error = False
         for index, output_neuron in enumerate(self.output_layer.neurons):
             if self.targets[index] != output_neuron.value:
@@ -71,8 +93,7 @@ class ArtificialNeuralNetwork:
         for output in self.output_layer.neurons:
             print(f"{output.value} değerli çıkış için hata hesaplaması: {output.error}")
         if has_error:
-            # Bu kısım hata varsa ağırlıkları değiştirir ve değerleri yeniden ayarlar
-            # Ağırlıkların ayarlanması
+
             for hidden_neuron in self.hidden_layers.neurons:
                 result = 0
                 for hidden_output_edge in hidden_neuron.output_edges:
@@ -85,7 +106,6 @@ class ArtificialNeuralNetwork:
                 for hidden_output_edge in hidden_neuron.output_edges:
                     hidden_output_edge.weight = hidden_output_edge.weight + hidden_output_edge.output_neuron.value * LEARNING_FACTOR * hidden_output_edge.output_neuron.error
 
-            # Değerlerin yeniden ayarlanması
             for hidden_neuron in self.hidden_layers.neurons:
                 hidden_value = 0
                 for input_edge in hidden_neuron.input_edges:

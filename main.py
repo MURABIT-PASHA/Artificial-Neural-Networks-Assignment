@@ -21,9 +21,6 @@ else:
         output_layer = None
 
         for key in file.iloc[row].keys():
-            # Giriş katmanının oluşturulduğu yer.
-            # Buradaki nöronların giriş kenarları yoktur.
-            # Sadece değerleri ve çıkış kenarları vardır.
             if key.__contains__("x"):
                 weights = [random.randint(1, 10) / 10 for _ in range(hidden_layer)]
                 value = float(file.loc[row, key])
@@ -45,13 +42,12 @@ else:
                 layer_type=LayerTypes.input_layer,
                 neurons=neurons,
             )
-        # Giriş katmanını ekleme işlemi bitti
 
-        # Eğer giriş katmanı oluşmuşsa gizli katman oluşturulacak
         if input_layer:
             neurons = []
             for j in range(hidden_layer):
-                weights = [random.randint(1, 10) / 10 for _ in range(sum("target" in column for column in file.columns))]
+                weights = [random.randint(1, 10) / 10 for _ in
+                           range(sum("target" in column for column in file.columns))]
                 input_edges = []
                 output_edges = []
                 for input_neuron in input_layer.neurons:
@@ -69,10 +65,7 @@ else:
                 neuron.set_output_edges(output_edges)
                 neurons.append(neuron)
 
-            # Gizli katman oluşturuldu
             if neurons:
-                # Burası ilk katman ile gizli katman arası bağlantıyı sağlayan yer, çok önemli
-                # Eğer burası olmazsa bağlı liste özelliği olmaz
                 for _neuron in input_layer.neurons:
                     for j, edge in enumerate(_neuron.output_edges):
                         edge.output_neuron = neurons[j]
@@ -82,7 +75,6 @@ else:
                     neurons=neurons
                 )
 
-        # Eğer ara (gizli) katman varsa son katmanımız oluşturulacak
         if intermediate_layer:
             neurons = []
             for j in range(sum("target" in column for column in file.columns)):
@@ -106,7 +98,7 @@ else:
 
         if output_layer:
             artificial_neural_network = ArtificialNeuralNetwork(
-                first_layer=input_layer,
+                input_layer=input_layer,
                 hidden_layers=intermediate_layer,
                 output_layer=output_layer,
                 targets=[float(file.loc[row, key]) for key in file.iloc[row].keys() if "target" in key]

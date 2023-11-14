@@ -10,13 +10,22 @@ class Edge:
 
 
 class Neuron:
-    def __init__(self, input_edges: List[Edge] = None, output_edges: List[Edge] = None, value: float = None, error: float = None):
+    def __init__(self,
+                 input_edges: List[Edge] = None,
+                 output_edges: List[Edge] = None,
+                 value: float = None,
+                 error: float = None):
         self.input_edges = input_edges
         self.value = value
         self.output_edges = output_edges
         self.error = error
 
     def calculate_input_value(self):
+        """
+        Bu fonksiyon gelen kenarlara göre **Sigmoid** fonksiyonu kullanarak
+        nöronun değerini ayarlar.
+        :return:
+        """
         if self.input_edges:
             result = 0
             for input_edge in self.input_edges:
