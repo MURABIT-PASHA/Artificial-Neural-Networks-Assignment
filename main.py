@@ -8,13 +8,6 @@ from neuron import Neuron
 
 
 table = [
-    # {
-    #     "x0": 10,
-    #     "x1": 30,
-    #     "x2": 20,
-    #     "target1": 0,
-    #     "target2": 0
-    # },
     {
         "x0": 1,
         "x1": 0,
@@ -23,30 +16,30 @@ table = [
         "target1": 0,
         "target2": 0
     },
-    # {
-    #     "x0": 0,
-    #     "x1": 1,
-    #     "x2": 0,
-    #     "x3": 0,
-    #     "target1": 0,
-    #     "target2": 1
-    # },
-    # {
-    #     "x0": 0,
-    #     "x1": 0,
-    #     "x2": 1,
-    #     "x3": 0,
-    #     "target1": 1,
-    #     "target2": 0
-    # },
-    # {
-    #     "x0": 0,
-    #     "x1": 0,
-    #     "x2": 0,
-    #     "x3": 1,
-    #     "target1": 1,
-    #     "target2": 1
-    # },
+    {
+        "x0": 0,
+        "x1": 1,
+        "x2": 0,
+        "x3": 0,
+        "target1": 0,
+        "target2": 1
+    },
+    {
+        "x0": 0,
+        "x1": 0,
+        "x2": 1,
+        "x3": 0,
+        "target1": 1,
+        "target2": 0
+    },
+    {
+        "x0": 0,
+        "x1": 0,
+        "x2": 0,
+        "x3": 1,
+        "target1": 1,
+        "target2": 1
+    },
 ]
 
 try:
@@ -153,10 +146,5 @@ else:
             )
             artificial_networks.append(artificial_neural_network)
     if artificial_networks:
-        while True:
-            key = input("Tekrar hesaplama için x tuşuna basın")
-            if key == "x":
-                for artificial_network in artificial_networks:
-                    artificial_network.calculate_tolerance()
-            else:
-                exit(1)
+        for artificial_network in artificial_networks:
+            artificial_network.create_image()

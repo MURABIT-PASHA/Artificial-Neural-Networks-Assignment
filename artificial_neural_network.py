@@ -1,6 +1,9 @@
 from typing import List
-from diagrams import Diagram, Edge, Node
+from matplotlib.widgets import Button
+
 from layer import Layer
+import networkx as nx
+import matplotlib.pyplot as plt
 
 LEARNING_FACTOR = 0.1
 
@@ -11,54 +14,61 @@ class ArtificialNeuralNetwork:
         self.hidden_layers = hidden_layers
         self.output_layer = output_layer
         self.targets = targets
+        self.graph = nx.DiGraph()
 
-    def create_diagram(self):
-        pass
+    def draw_diagram(self):
+        for i, first in enumerate(self.first_layer.neurons):
+            self.graph.add_node(f'x{i}', label=f"{first.value}", pos=([0, -i]))
+
+        # Add nodes and edges for the hidden layer
+        for i, hidden in enumerate(self.hidden_layers.neurons):
+            self.graph.add_node(f'h{i}', label=f"{hidden.value}", pos=([20, -i]))
+
+        # Add nodes and edges for the output layer
+        for i, output in enumerate(self.output_layer.neurons):
+            self.graph.add_node(f'o{i}', label=f"{output.value}", pos=([40, -i]))
+
+        # Add edges between nodes
+        for i, first in enumerate(self.first_layer.neurons):
+            for j, hidden in enumerate(self.hidden_layers.neurons):
+                weight = self.first_layer.neurons[i].output_edges[j].weight
+                self.graph.add_edge(f'x{i}', f'h{j}', weight=weight)
+
+        for i, hidden in enumerate(self.hidden_layers.neurons):
+            for j, output in enumerate(self.output_layer.neurons):
+                weight = self.hidden_layers.neurons[i].output_edges[j].weight
+                self.graph.add_edge(f'h{i}', f'o{j}', weight=weight)
+        pos = nx.get_node_attributes(self.graph, 'pos')
+        edge_labels = nx.get_edge_attributes(self.graph, 'weight')
+        node_labels = nx.get_node_attributes(self.graph, 'label')
+        print(node_labels)
+        nx.draw(self.graph, pos, with_labels=True, node_size=500, node_color='skyblue', labels=node_labels)
+        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=edge_labels)
 
     def create_image(self):
-        for i, input_neuron in enumerate(self.first_layer.neurons):
-            print(f"Giriş değeri: {input_neuron.value}")
-            for j, edge in enumerate(input_neuron.output_edges):
-                print(f"w{i}{j}: {edge.weight}")
+        self.draw_diagram()
 
-        for i, hidden_neuron in enumerate(self.hidden_layers.neurons):
-            print(f"Giriş değeri: {hidden_neuron.value}")
-            for j, edge in enumerate(hidden_neuron.output_edges):
-                print(f"w{i}{j}: {edge.weight}")
+        def on_button_click(event):
+            plt.clf()
+            self.calculate_tolerance()
+            self.draw_diagram()
+            button_pos = plt.axes([0.8, 0.05, 0.2, 0.05])
+            b1 = Button(button_pos, 'Devam Et')
+            b1.on_clicked(on_button_click)
+            plt.draw()
 
-        for i, output_neuron in enumerate(self.output_layer.neurons):
-            print(f"Çıkış değeri: {output_neuron.value}")
-
-        with Diagram("YSA", show=False, direction="LR"):
-            first_nodes = []
-            hidden_nodes = []
-            output_nodes = []
-            for first in self.first_layer.neurons:
-                first_nodes.append(Node(label=f"{first.value}", shape="circle", height=".25"))
-            for hidden in self.hidden_layers.neurons:
-                hidden_nodes.append(Node(label=f"{hidden.value}", shape="circle", height=".25"))
-            for output in self.output_layer.neurons:
-                output_nodes.append(Node(label=f"{output.value}", shape="circle", height=".25"))
-
-            for first in range(len(first_nodes)):
-                for hidden in range(len(hidden_nodes)):
-                    first_nodes[first].connect(hidden_nodes[hidden], edge=Edge(color="red",
-                                                                               label=f"\t{self.first_layer.neurons[first].output_edges[hidden].weight}\t\n",
-                                                                               forward=True, fontsize="15"))
-            for hidden in range(len(hidden_nodes)):
-                for output in range(len(output_nodes)):
-                    hidden_nodes[hidden].connect(output_nodes[output], edge=Edge(color="red",
-                                                                                 label=f"\t{self.hidden_layers.neurons[hidden].output_edges[output].weight}\t\n",
-                                                                                 forward=True, fontsize="15"))
+        button_pos = plt.axes([0.8, 0.05, 0.2, 0.05])
+        b1 = Button(button_pos, 'Devam Et')
+        b1.on_clicked(on_button_click)
+        plt.show()
 
     def calculate_tolerance(self):
-        self.create_image()
         has_error = False
-        for index in range(len(self.targets)):
-            if self.targets[index] != self.output_layer.neurons[index].value:
+        for index, output_neuron in enumerate(self.output_layer.neurons):
+            if self.targets[index] != output_neuron.value:
                 has_error = True
-                s = self.output_layer.neurons[index].value * (1 - self.output_layer.neurons[index].value) * (
-                        self.targets[index] - self.output_layer.neurons[index].value)
+                s = output_neuron.value * (1 - output_neuron.value) * (
+                        self.targets[index] - output_neuron.value)
                 self.output_layer.neurons[index].error = s
         print("Hata hesaplaması yapılıyor...")
         for output in self.output_layer.neurons:
