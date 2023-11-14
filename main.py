@@ -51,7 +51,7 @@ else:
         if input_layer:
             neurons = []
             for j in range(hidden_layer):
-                weights = [random.randint(1, 10) / 10 for _ in range(2)]
+                weights = [random.randint(1, 10) / 10 for _ in range(sum("target" in column for column in file.columns))]
                 input_edges = []
                 output_edges = []
                 for input_neuron in input_layer.neurons:
@@ -60,7 +60,7 @@ else:
                     input_edges=input_edges,
                 )
                 neuron.calculate_input_value()
-                for k in range(2):
+                for k in range(sum("target" in column for column in file.columns)):
                     edge = Edge(
                         input_neuron=neuron,
                         weight=weights[k]
@@ -85,7 +85,7 @@ else:
         # Eğer ara (gizli) katman varsa son katmanımız oluşturulacak
         if intermediate_layer:
             neurons = []
-            for j in range(2):
+            for j in range(sum("target" in column for column in file.columns)):
                 input_edges = []
                 for hidden_neuron in intermediate_layer.neurons:
                     input_edges.append(hidden_neuron.output_edges[j])
