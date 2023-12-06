@@ -1,0 +1,52 @@
+#:import toast kivymd.toast.toast
+MDScreen:
+    FloatLayout:
+        MDBoxLayout:
+            orientation: 'vertical'
+            spacing: 10
+            ScreenManager:
+                id:screen_manager
+                Screen:
+                    MDBoxLayout:
+                        size_hint: (1,1)
+                        pos_hint: {'center_x':.5, 'center_y':.5}
+                        orientation: 'horizontal'
+                        spacing: 10
+                        MDBoxLayout:
+                            size_hint: (1,1)
+                            padding: "10dp"
+                            pos_hint: {'center_x':.5, 'center_y':.5}
+                            orientation: 'vertical'
+                            MDBoxLayout:
+                                size_hint: (1,.2)
+                                padding: "10dp"
+                                MDBoxLayout:
+                                    orientation: 'horizontal'
+                                    spacing: 20
+                                    MDTextField:
+                                        id: layer_count
+                                        hint_text: "Ara katman nöron sayısı"
+                                        mode: "rectangle"
+                                        text: "5"
+                                        required: True
+                                    MDRectangleFlatButton:
+                                        id: generate_button
+                                        text: "Çalıştır"
+                                        size: (100, 50)
+                                        height: 50
+                                        theme_text_color: "Custom"
+                                        text_color: "white"
+                                        line_color: "red"
+                                        on_release: app.generate()
+                            MDBoxLayout:
+                                size_hint: (1,1)
+                                canvas.before:
+                                    Color:
+                                        rgba: 1, 1, 1, 1
+                                    Line:
+                                        width: 1
+                                        rectangle: self.x, self.y, self.width, self.height
+
+                                Label:
+                                    pos_hint: {'center_x':.5, 'center_y':.5}
+                                    text: "csv dosyanızı buraya sürükleyin"
